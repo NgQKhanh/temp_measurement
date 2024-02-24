@@ -1,0 +1,4 @@
+".\Objects\STARTUP.obj",
+".\Objects\machdo.obj" 
+TO ".\Objects\machdo" 
+PRINT(".\Listings\machdo.m51")

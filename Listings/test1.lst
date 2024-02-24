@@ -1,0 +1,352 @@
+A51 MACRO ASSEMBLER  TEST1                                                                06/29/2022 09:54:23 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\test1.obj
+ASSEMBLER INVOKED BY: E:\Simulation\C51\BIN\A51.EXE test1.asm SET(SMALL) DEBUG PRINT(.\Listings\test1.lst) OBJECT(.\Obje
+                      cts\test1.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;;=================================
+                       2     ;; do nhiet do
+                       3     ;;=================================
+                       4     
+                       5     ;rdd  bit p2.5  
+                       6     ;wrr  bit p2.6
+                       7     ;intr bit p2.7
+                       8     
+                       9     ;led1 bit p2.0
+                      10     ;led2 bit p2.1
+                      11     ;led3 bit p2.2
+                      12     ;led4 bit p2.3
+                      13     ;       
+                      14     ;tang bit p3.2
+                      15     ;giam bit p3.3
+                      16     ;coi  bit p3.7
+                      17     ;       
+                      18     ;clr coi
+                      19     ;mov r1,#50                                             ; set nhiet do canh bao ban dau la 
+                             50
+                      20     
+                      21     ;main:  
+                      22     ;       lcall cdoi                                      ; sau khi cdoi gia tri nhiet do luu
+                              vao a
+                      23     ;       mov    r2,a
+                      24     ;       SubB   a,r1                                     ;kiem tra nhiet do ( neu a > r1 thi
+                              c = 0; a < r1 thi c = 1)
+                      25     ;       jc kocanhbao                    ; c = 1 thi khong canh bao
+                      26     ;       jmp canhbao                                     ; c = 0 thi bat canh bao
+                      27     ;       kocanhbao: 
+                      28     ;       clr coi                                         ; tat coi canh bao
+                      29     ;       mov a, r2                                       ; hien thi nhiet do nhu binh thuong
+                      30     ;       lcall hex_bcd
+                      31     ;       lcall bcd_7doan
+                      32     ;       lcall hienthi
+                      33     ;       jnb tang,set_tang                       ; neu bam nut tang -> tang nhiet do canh bao
+                      34     ;       jnb giam,set_giam                       ; neu bam nut giam -> giam nhiet do canh bao
+                      35     ;       jmp main
+                      36     ;cdoi:
+                      37     ;       setb rdd
+                      38     ;       clr  rdd
+                      39     ;       clr wrr
+                      40     ;       jnb intr,$
+                      41     ;       setb wrr
+                      42     ;       mov a,p1
+                      43     ;       ret
+                      44     ;hex_bcd:
+                      45     ;       mov b,#10
+                      46     ;       div ab
+                      47     ;       mov 10h,b           ; 10h hang don vi
+                      48     ;       mov b,#10
+                      49     ;       div ab
+                      50     ;       mov 11h,b                       ; 11h hang chuc 
+                      51     ;       mov 12h,a                       ; 12h hang tram
+                      52     ;       ret
+                      53     ;bcd_7doan:
+                      54     ;       mov dptr,#900h
+A51 MACRO ASSEMBLER  TEST1                                                                06/29/2022 09:54:23 PAGE     2
+
+                      55     ;       mov a,10h
+                      56     ;       movc a,@a + dptr
+                      57     ;       mov 20h,a                       ; 20h cs hang don vi     
+                      58     ;       mov a,11h
+                      59     ;       movc a,@a + dptr
+                      60     ;       mov 21h,a                       ; 21h cs hang chuc
+                      61     ;       mov a,12h
+                      62     ;       movc a,@a + dptr
+                      63     ;       mov 22h,a                       ;22h cs hang tram
+                      64     ;       ret
+                      65     ;hienthi: 
+                      66     ;       mov p0,#63h                     ; hien thi do
+                      67     ;       clr led4
+                      68     ;       lcall delay
+                      69     ;       setb led4
+                      70     ;       ;anl p1,#0f0h
+                      71     ;       
+                      72     ;       mov p0,20h
+                      73     ;       clr led3
+                      74     ;       lcall delay
+                      75     ;       setb led3
+                      76     ;       ;anl p1,#0f0h      ; p1=----0000
+                      77     
+                      78     ;       mov p0,21h
+                      79     ;       clr led2
+                      80     ;       lcall delay
+                      81     ;       setb led2
+                      82     ;       ;anl p1,#0f0h
+                      83     
+                      84     ;       mov p0,22h
+                      85     ;       clr led1
+                      86     ;       lcall delay
+                      87     ;       setb led1
+                      88     ;       ;anl p1,#0f0h
+                      89     ;       ret
+                      90     
+                      91     ;set_tang:      inc r1                          ; tang r1 
+                      92     ;                       jmp setnhietdo
+                      93     ;set_giam:   dec r1                             ; giam r1
+                      94     ;setnhietdo:                                    ; hien thi r1 va delay 1 khoang thoi gian
+                      95     ;       mov 50H,#5
+                      96     ;loop1: 
+                      97     ;       mov 51H,#250       
+                      98     ;loop:    
+                      99     ;       mov a,r1
+                     100     ;       lcall hex_bcd
+                     101     ;       lcall bcd_7doan
+                     102     ;       lcall hienthi
+                     103     ;;      jnb tang,set_tang                       ; neu bam nut tang -> tang nhiet do canh ba
+                             o    
+                     104     ;;      jnb giam,set_giam                       ; neu bam nut giam -> giam nhiet do canh bao
+                     105     ;       djnz 51H,loop
+                     106     ;    djnz 50H,loop1      
+                     107     ;       jmp main         
+                     108     ;       
+                     109     ;canhbao:
+                     110     ;       setb  coi                                       ; bat coi canh bao
+                     111     ;       mov p0,#07fh                            ; hien thi nhap nhay 8888
+                     112     ;       anl p2,#0f0h
+                     113     ;       lcall delay_500ms
+                     114     ;       orl p2,#0fh
+                     115     ;       lcall delay_500ms       
+                     116     ;       jnc canhbao                                     ; neu chua bam reset (c = 0) tiep t
+                             uc canh bao
+                     117     ;       jmp main
+                     118     
+A51 MACRO ASSEMBLER  TEST1                                                                06/29/2022 09:54:23 PAGE     3
+
+                     119     ;delay: 
+                     120     ;       mov 7fh,#100
+                     121     ;       djnz 7fh,$
+                     122     ;       ret
+                     123     ;       
+                     124     ;delay_500ms:
+                     125     ;       mov 50H,#200
+                     126     ;loop2: 
+                     127     ;       mov 51H,#250
+                     128     ;       kt: orl c,/tang                         ; neu bam nut tang thi c = 1 ( bam reset)
+                     129     ;       djnz 51H,kt
+                     130     ;       djnz 50H,loop2
+                     131     ;       ret
+                     132     
+                     133     ;org 900h
+                     134     ;db 03fh,006h,05bh,04fh,066h,06dh,07dh,007h,07fh,06fh
+                     135     ;;db 0C0h, 0F9h,0A4h, 0B0h,99h, 92h, 82h, 0f8h, 80h, 90h
+                     136     ;END
+                     137     
+                     138     ;=================================
+                     139     ; do nhiet do
+                     140     ;=================================
+                     141     
+0000                 142     org 000h
+0000 020024          143     ljmp main 
+                     144     
+0003                 145     org 0003h
+0003 09              146             inc r1
+0004 12008E          147             lcall setnhietdo
+0007 22              148             ret
+0013                 149     org 0013h
+0013 19              150             dec r1
+0014 12008E          151             lcall setnhietdo
+0017 22              152             ret
+0018 7932            153     mov r1,#50                                              ; set nhiet do canh bao ban dau la 
+                             50
+  00A5               154     rdd  bit p2.5   
+  00A6               155     wrr  bit p2.6
+  00A7               156     intr bit p2.7
+                     157     
+  00A0               158     led1 bit p2.0
+  00A1               159     led2 bit p2.1
+  00A2               160     led3 bit p2.2
+  00A3               161     led4 bit p2.3
+                     162             
+  00B2               163     tang bit p3.2
+  00B3               164     giam bit p3.3
+                     165     ;coi  bit p3.7
+                     166     ;       
+                     167     ;clr coi
+001A D2A8            168     setb ex0
+001C D2AA            169     setb ex1
+001E D2AF            170     setb ea
+0020 C288            171     clr it0
+0022 C28A            172     clr it1
+                     173     
+0024                 174     main:   
+0024 120035          175             lcall cdoi                                      ; sau khi cdoi gia tri nhiet do luu
+                              vao a
+0027 FA              176             mov    r2,a
+0028 99              177             SubB   a,r1                                     ;kiem tra nhiet do ( neu a > r1 thi
+                              c = 0; a < r1 thi c = 1)
+0029 4002            178             jc kocanhbao                    ; c = 1 thi khong canh bao
+002B 8072            179             jmp canhbao                                     ; c = 0 thi bat canh bao
+002D                 180             kocanhbao: 
+002D                 181             clr coi                                         ; tat coi canh bao
+A51 MACRO ASSEMBLER  TEST1                                                                06/29/2022 09:54:23 PAGE     4
+
+*** _____________________________________^
+*** ERROR #A45 IN 181 (test1.asm, LINE 181): UNDEFINED SYMBOL (PASS-2)
+002F EA              182             mov a, r2                                       ; hien thi nhiet do nhu binh thuong
+0030 120043          183             lcall hienthi
+0033 80EF            184             jmp main
+0035                 185     cdoi:
+0035 D2A5            186             setb rdd
+0037 C2A5            187             clr  rdd
+0039 C2A6            188             clr wrr
+003B 30A7FD          189             jnb intr,$
+003E D2A6            190             setb wrr
+0040 E590            191             mov a,p1
+0042 22              192             ret
+0043                 193     hienthi:
+0043 75F00A          194             mov b,#10
+0046 84              195             div ab
+0047 85F010          196             mov 10h,b           ; 10h hang don vi
+004A 75F00A          197             mov b,#10
+004D 84              198             div ab
+004E 85F011          199             mov 11h,b                       ; 11h hang chuc 
+0051 F512            200             mov 12h,a                       ; 12h hang tram
+0053 900900          201             mov dptr,#900h
+0056 E510            202             mov a,10h
+0058 93              203             movc a,@a + dptr
+0059 F520            204             mov 20h,a                       ; 20h cs hang don vi     
+005B E511            205             mov a,11h
+005D 93              206             movc a,@a + dptr
+005E F521            207             mov 21h,a                       ; 21h cs hang chuc
+0060 E512            208             mov a,12h
+0062 93              209             movc a,@a + dptr
+0063 F522            210             mov 22h,a                       ;22h cs hang tram
+0065 758060          211             mov p0,#60h                     ; hien thi do
+0068 C2A3            212             clr led4
+006A 1200B2          213             lcall delay
+006D D2A3            214             setb led4
+                     215             ;anl p1,#0f0h
+                     216             
+006F 852080          217             mov p0,20h
+0072 C2A2            218             clr led3
+0074 1200B2          219             lcall delay
+0077 D2A2            220             setb led3
+                     221             ;anl p1,#0f0h      ; p1=----0000
+                     222     
+0079 852180          223             mov p0,21h
+007C C2A1            224             clr led2
+007E 1200B2          225             lcall delay
+0081 D2A1            226             setb led2
+                     227             ;anl p1,#0f0h
+                     228     
+0083 852280          229             mov p0,22h
+0086 C2A0            230             clr led1
+0088 1200B2          231             lcall delay
+008B D2A0            232             setb led1
+                     233             ;anl p1,#0f0h
+008D 22              234             ret
+                     235     
+                     236     
+008E                 237     setnhietdo:                                     
+008E 755005          238             mov 50H,#5
+0091                 239     loop1: 
+0091 7551FA          240             mov 51H,#250       
+0094                 241     loop:    
+0094 E9              242             mov a,r1
+0095 120043          243             lcall hienthi
+0098 D551F9          244             djnz 51H,loop
+009B D550F3          245         djnz 50H,loop1       
+A51 MACRO ASSEMBLER  TEST1                                                                06/29/2022 09:54:23 PAGE     5
+
+009E 22              246             ret
+                     247             
+009F                 248     canhbao:
+                     249     ;       setb  coi                                       ; bat coi canh bao
+009F 75807F          250             mov p0,#07fh                            ; hien thi nhap nhay 8888
+00A2 53A0F0          251             anl p2,#0f0h
+00A5 1200B9          252             lcall delay_500ms
+00A8 43A00F          253             orl p2,#0fh
+00AB 1200B9          254             lcall delay_500ms       
+00AE 50EF            255             jnc canhbao                                     ; neu chua bam reset (c = 0) tiep tuc canh bao
+00B0 0124            256             jmp main
+                     257     
+00B2                 258     delay: 
+00B2 757F64          259             mov 7fh,#100
+00B5 D57FFD          260             djnz 7fh,$
+00B8 22              261             ret
+                     262             
+00B9                 263     delay_500ms:
+00B9 7550C8          264             mov 50H,#200
+00BC                 265     loop2: 
+00BC 7551FA          266             mov 51H,#250
+00BF A0B2            267             kt: orl c,/tang                         ; neu bam nut tang thi c = 1 ( bam reset)
+00C1 D551FB          268             djnz 51H,kt
+00C4 D550F5          269             djnz 50H,loop2
+00C7 22              270             ret
+                     271     
+0900                 272     org 900h
+0900 3F065B4F        273     db 03fh,006h,05bh,04fh,066h,06dh,07dh,007h,07fh,06fh
+0904 666D7D07                
+0908 7F6F                    
+                     274     ;db 0C0h, 0F9h,0A4h, 0B0h,99h, 92h, 82h, 0f8h, 80h, 90h
+                     275     END
+                             
+A51 MACRO ASSEMBLER  TEST1                                                                06/29/2022 09:54:23 PAGE     6
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+B. . . . . . . . .  D ADDR   00F0H   A   
+CANHBAO. . . . . .  C ADDR   009FH   A   
+CDOI . . . . . . .  C ADDR   0035H   A   
+COI. . . . . . . .    ----   -----       
+DELAY. . . . . . .  C ADDR   00B2H   A   
+DELAY_500MS. . . .  C ADDR   00B9H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+EX1. . . . . . . .  B ADDR   00A8H.2 A   
+GIAM . . . . . . .  B ADDR   00B0H.3 A   
+HIENTHI. . . . . .  C ADDR   0043H   A   
+INTR . . . . . . .  B ADDR   00A0H.7 A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+KOCANHBAO. . . . .  C ADDR   002DH   A   
+KT . . . . . . . .  C ADDR   00BFH   A   
+LED1 . . . . . . .  B ADDR   00A0H.0 A   
+LED2 . . . . . . .  B ADDR   00A0H.1 A   
+LED3 . . . . . . .  B ADDR   00A0H.2 A   
+LED4 . . . . . . .  B ADDR   00A0H.3 A   
+LOOP . . . . . . .  C ADDR   0094H   A   
+LOOP1. . . . . . .  C ADDR   0091H   A   
+LOOP2. . . . . . .  C ADDR   00BCH   A   
+MAIN . . . . . . .  C ADDR   0024H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+RDD. . . . . . . .  B ADDR   00A0H.5 A   
+SETNHIETDO . . . .  C ADDR   008EH   A   
+TANG . . . . . . .  B ADDR   00B0H.2 A   
+WRR. . . . . . . .  B ADDR   00A0H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 1 ERROR(S)

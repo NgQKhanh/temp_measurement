@@ -1,0 +1,239 @@
+A51 MACRO ASSEMBLER  MACHDO                                                               07/21/2022 16:23:34 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\machdo.obj
+ASSEMBLER INVOKED BY: E:\Simulation\C51\BIN\A51.EXE machdo.asm SET(SMALL) DEBUG PRINT(.\Listings\machdo.lst) OBJECT(.\Ob
+                      jects\machdo.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;=================================
+                       2     ; do nhiet do
+                       3     ;=================================
+                       4     
+0000                   5     org 000h
+0000 8015              6     jmp setup 
+                       7     
+0003                   8     org 0003h
+0003 09                9             inc r1 
+0004 D3               10             setb c                                          ;bam reset (c = 1) 
+0005 D27F             11             setb 7fh
+0007 32               12             reti
+                      13             
+0013                  14     org 0013h
+0013 19               15             dec r1
+0014 D27F             16             setb 7fh
+0016 32               17             reti
+                      18             
+0017                  19     setup:
+0017 7932             20             mov r1,#50                                              ; set nhiet do canh bao ban
+                              dau la 50
+                      21     
+  00A5                22             eoc  bit p2.5   
+  00A6                23             ale  bit p2.6
+  00A7                24             start bit p2.7
+                      25     
+  00A0                26             led1 bit p2.0
+  00A1                27             led2 bit p2.1
+  00A2                28             led3 bit p2.2
+  00A3                29             led4 bit p2.3
+                      30                     
+  00B2                31             tang bit p3.2
+  00B3                32             giam bit p3.3
+  00B7                33             coi  bit p3.7
+0019 C2B7             34             clr coi
+                      35     
+001B D2A8             36             setb ex0
+001D D2AA             37             setb ex1
+001F D2AF             38             setb ea
+0021 D288             39             setb it0
+0023 D28A             40             setb it1
+                      41     
+0025 C27F             42             clr 7fh
+0027 7C01             43             mov r4,#1
+                      44     
+0029                  45     main:    
+                      46             
+                      47     ;       jnb 7eh, kocanhbao
+0029 12003F           48             lcall lay_mau
+002C 020075           49             ljmp kiemtra
+002F                  50             kocanhbao: 
+002F 207F71           51             jb 7fh,setnhietdo
+0032 EA               52             mov a, r2
+0033 120050           53             lcall chuyen_doi
+0036 7F96             54             mov r7,#150
+0038 12007A           55             de: lcall hien_thi
+003B DFFB             56             djnz r7,de
+A51 MACRO ASSEMBLER  MACHDO                                                               07/21/2022 16:23:34 PAGE     2
+
+003D 80EA             57             jmp main
+                      58     
+003F                  59     lay_mau:
+003F C27E             60             clr 7eh
+0041 D2A6             61             setb ale
+0043 D2A7             62             setb start
+0045 C2A7             63             clr start
+0047 30A5FD           64             jnb eoc,$          
+004A C2A6             65             clr ale
+004C E590             66             mov a,p1
+004E FA               67             mov r2,a
+004F 22               68             ret
+                      69             
+0050                  70     chuyen_doi:
+0050 C2B7             71             clr coi
+0052 75F00A           72             mov b,#10                                       ; tach cs tram chuc don vi
+0055 84               73             div ab
+0056 85F010           74             mov 10h,b           
+0059 75F00A           75             mov b,#10
+005C 84               76             div ab
+005D 85F011           77             mov 11h,b                       
+0060 F512             78             mov 12h,a                       
+                      79             
+0062 900900           80             mov dptr,#900h                          ; chuyen sang ma led
+0065 E510             81             mov a,10h
+0067 93               82             movc a,@a + dptr
+0068 F520             83             mov 20h,a                        
+006A E511             84             mov a,11h
+006C 93               85             movc a,@a + dptr
+006D F521             86             mov 21h,a                       
+006F E512             87             mov a,12h
+0071 93               88             movc a,@a + dptr
+0072 F522             89             mov 22h,a               
+0074 22               90             ret
+                      91             
+0075                  92     kiemtra:
+0075 99               93             SubB   a,r1                                     ;kiem tra nhiet do ( neu a >= r1 th
+                             i c = 0; a < r1 thi c = 1)   
+0076 40B7             94             jc kocanhbao                    ; c = 1 thi khong canh bao
+0078 8043             95             jmp canhbao                                     ; c = 0 thi bat canh bao
+                      96             
+007A                  97     hien_thi:       
+007A 75809C           98             mov p0,#9ch                                     ; hien thi do
+007D D2A3             99             setb led4
+007F 1200D2          100             lcall delay
+0082 C2A3            101             clr led4        
+0084 852080          102             mov p0,20h
+0087 D2A2            103             setb led3
+0089 1200D2          104             lcall delay
+008C C2A2            105             clr led3
+008E 852180          106             mov p0,21h
+0091 D2A1            107             setb led2
+0093 1200D2          108             lcall delay
+0096 C2A1            109             clr led2        
+0098 852280          110             mov p0,22h
+009B D2A0            111             setb led1
+009D 1200D2          112             lcall delay
+00A0 C2A0            113             clr led1
+00A2 22              114             ret
+                     115             
+00A3                 116     setnhietdo:                                     ; hien thi r1 va delay 1 khoang thoi gian  
+                                  
+00A3 C27F            117             clr 7fh
+00A5 755005          118             mov 50H,#5
+00A8                 119     loop1: 
+00A8 7551FA          120             mov 51H,#250       
+A51 MACRO ASSEMBLER  MACHDO                                                               07/21/2022 16:23:34 PAGE     3
+
+00AB                 121     loop:    
+00AB E9              122             mov a,r1
+00AC 120050          123             lcall chuyen_doi
+00AF 12007A          124             lcall hien_thi
+00B2 D551F6          125             djnz 51H,loop
+00B5 D550F0          126         djnz 50H,loop1       
+00B8 207FE8          127             jb 7fh,setnhietdo
+00BB 0129            128             jmp main
+                     129             
+00BD                 130     canhbao:
+00BD D2B7            131             setb  coi                                       ; bat coi canh bao
+00BF 758080          132             mov p0,#80h                             ; hien thi nhap nhay 8888
+00C2 53A0F0          133             anl p2,#0f0h
+00C5 1200D9          134             lcall delay_500ms
+00C8 43A00F          135             orl p2,#0fh
+00CB 1200D9          136             lcall delay_500ms       
+00CE 50ED            137             jnc canhbao                                     ; neu chua bam reset (c = 0) tiep t
+                             uc canh bao
+00D0 0129            138             jmp main
+                     139             
+                     140     ;set_timer:
+                     141     ;       clr tr0                                         
+                     142     ;       clr tf0
+                     143     ;    mov th0,#3ch                               ; set timer chay 50 000 chu ky 
+                     144     ;       mov tl0,#0b0h
+                     145     ;       setb tr0
+                     146     ;       djnz r5,endtask                 
+                     147     ;       setb 7eh
+                     148     ;       mov r5,2
+                     149     ;       endtask:
+                     150     ;       ret
+                     151     
+00D2                 152     delay: 
+00D2 756E96          153             mov 6eh,#150
+00D5 D56EFD          154             djnz 6eh,$
+00D8 22              155             ret
+                     156             
+00D9                 157     delay_500ms:
+00D9 7550C8          158             mov 50H,#200
+00DC                 159     loop2: 
+00DC 7551FA          160             mov 51H,#250
+00DF D551FD          161             djnz 51H,$
+00E2 D550F7          162             djnz 50H,loop2
+00E5 22              163             ret
+                     164     
+0900                 165     org 900h
+                     166     ;db 03fh,006h,05bh,04fh,066h,06dh,07dh,007h,07fh,06fh
+0900 C0F9A4B0        167     db 0C0h, 0F9h,0A4h, 0B0h,99h, 92h, 82h, 0f8h, 80h, 90h
+0904 999282F8                
+0908 8090                    
+                     168             
+                     169     END
+                             
+A51 MACRO ASSEMBLER  MACHDO                                                               07/21/2022 16:23:34 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+ALE. . . . . . . .  B ADDR   00A0H.6 A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+CANHBAO. . . . . .  C ADDR   00BDH   A   
+CHUYEN_DOI . . . .  C ADDR   0050H   A   
+COI. . . . . . . .  B ADDR   00B0H.7 A   
+DE . . . . . . . .  C ADDR   0038H   A   
+DELAY. . . . . . .  C ADDR   00D2H   A   
+DELAY_500MS. . . .  C ADDR   00D9H   A   
+EA . . . . . . . .  B ADDR   00A8H.7 A   
+EOC. . . . . . . .  B ADDR   00A0H.5 A   
+EX0. . . . . . . .  B ADDR   00A8H.0 A   
+EX1. . . . . . . .  B ADDR   00A8H.2 A   
+GIAM . . . . . . .  B ADDR   00B0H.3 A   
+HIEN_THI . . . . .  C ADDR   007AH   A   
+IT0. . . . . . . .  B ADDR   0088H.0 A   
+IT1. . . . . . . .  B ADDR   0088H.2 A   
+KIEMTRA. . . . . .  C ADDR   0075H   A   
+KOCANHBAO. . . . .  C ADDR   002FH   A   
+LAY_MAU. . . . . .  C ADDR   003FH   A   
+LED1 . . . . . . .  B ADDR   00A0H.0 A   
+LED2 . . . . . . .  B ADDR   00A0H.1 A   
+LED3 . . . . . . .  B ADDR   00A0H.2 A   
+LED4 . . . . . . .  B ADDR   00A0H.3 A   
+LOOP . . . . . . .  C ADDR   00ABH   A   
+LOOP1. . . . . . .  C ADDR   00A8H   A   
+LOOP2. . . . . . .  C ADDR   00DCH   A   
+MAIN . . . . . . .  C ADDR   0029H   A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+SETNHIETDO . . . .  C ADDR   00A3H   A   
+SETUP. . . . . . .  C ADDR   0017H   A   
+START. . . . . . .  B ADDR   00A0H.7 A   
+TANG . . . . . . .  B ADDR   00B0H.2 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)
